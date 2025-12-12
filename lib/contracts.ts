@@ -1,217 +1,198 @@
+import type { Address } from "viem";
+
 export const CONTRACT_ADDRESSES = {
-  donut: "0xAE4a37d554C6D6F3E398546d8566B25052e0169C",
-  miner: "0xF69614F4Ee8D4D3879dd53d5A039eB3114C794F6",
-  multicall: "0x3ec144554b484C6798A683E34c8e8E222293f323",
-  provider: "0xba366c82815983ff130c23ced78bd95e1f2c18ea",
+  factory: "0x2B31F6E90D0E0e1f3814a3B9d76a9f4cE3b2E6c0" as Address,
 } as const;
 
-export const MULTICALL_ABI = [
+export enum BountyState {
+  OPEN = 0,
+  VOTING = 1,
+  CLOSED = 2,
+  CANCELLED = 3,
+}
+
+export type BountyMetadata = {
+  title: string;
+  description: string;
+  imageUrl?: string;
+  externalUrl?: string;
+};
+
+// POIDH Factory ABI - for fetching bounty addresses
+export const POIDH_FACTORY_ABI = [
+  {
+    inputs: [],
+    name: "getBountiesCount",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "provider",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "epochId",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "deadline",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "maxPrice",
-        type: "uint256",
-      },
-      {
-        internalType: "string",
-        name: "uri",
-        type: "string",
-      },
+      { internalType: "uint256", name: "limit", type: "uint256" },
+      { internalType: "uint256", name: "offset", type: "uint256" },
     ],
-    name: "mine",
+    name: "getBounties",
+    outputs: [{ internalType: "address[]", name: "", type: "address[]" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "string", name: "metadataURI", type: "string" },
+      { internalType: "bool", name: "joinable", type: "bool" },
+    ],
+    name: "createBounty",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
+    stateMutability: "payable",
+    type: "function",
+  },
+] as const;
+
+// POIDH Bounty ABI - for individual bounty interactions
+export const POIDH_ABI = [
+  // Read functions
+  {
+    inputs: [],
+    name: "issuer",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "metadataURI",
+    outputs: [{ internalType: "string", name: "", type: "string" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "state",
+    outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "joinable",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "totalStaked",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getClaimsCount",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "claimId", type: "uint256" }],
+    name: "getClaim",
+    outputs: [
+      { internalType: "address", name: "claimant", type: "address" },
+      { internalType: "string", name: "name", type: "string" },
+      { internalType: "string", name: "proofURI", type: "string" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "currentVote",
+    outputs: [
+      { internalType: "uint256", name: "claimId", type: "uint256" },
+      { internalType: "uint256", name: "yes", type: "uint256" },
+      { internalType: "uint256", name: "no", type: "uint256" },
+      { internalType: "uint256", name: "deadline", type: "uint256" },
+      { internalType: "uint256", name: "votingRound", type: "uint256" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "account", type: "address" }],
+    name: "account_Stake",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "account", type: "address" },
+      { internalType: "uint256", name: "votingRound", type: "uint256" },
+    ],
+    name: "account_Round_HasVoted",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  // Write functions
+  {
+    inputs: [],
+    name: "stake",
     outputs: [],
     stateMutability: "payable",
     type: "function",
   },
   {
     inputs: [
-      {
-        internalType: "uint256",
-        name: "epochId",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "deadline",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "maxPaymentTokenAmount",
-        type: "uint256",
-      },
+      { internalType: "string", name: "name", type: "string" },
+      { internalType: "string", name: "proofURI", type: "string" },
     ],
-    name: "buy",
+    name: "submitClaim",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-    ],
-    name: "getMiner",
-    outputs: [
-      {
-        components: [
-          {
-            internalType: "uint16",
-            name: "epochId",
-            type: "uint16",
-          },
-          {
-            internalType: "uint192",
-            name: "initPrice",
-            type: "uint192",
-          },
-          {
-            internalType: "uint40",
-            name: "startTime",
-            type: "uint40",
-          },
-          {
-            internalType: "uint256",
-            name: "glazed",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "price",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "dps",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "nextDps",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "donutPrice",
-            type: "uint256",
-          },
-          {
-            internalType: "address",
-            name: "miner",
-            type: "address",
-          },
-          {
-            internalType: "string",
-            name: "uri",
-            type: "string",
-          },
-          {
-            internalType: "uint256",
-            name: "ethBalance",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "wethBalance",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "donutBalance",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct Multicall.MinerState",
-        name: "state",
-        type: "tuple",
-      },
-    ],
-    stateMutability: "view",
+    inputs: [{ internalType: "uint256", name: "claimId", type: "uint256" }],
+    name: "initiateVote",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-    ],
-    name: "getAuction",
-    outputs: [
-      {
-        components: [
-          {
-            internalType: "uint16",
-            name: "epochId",
-            type: "uint16",
-          },
-          {
-            internalType: "uint192",
-            name: "initPrice",
-            type: "uint192",
-          },
-          {
-            internalType: "uint40",
-            name: "startTime",
-            type: "uint40",
-          },
-          {
-            internalType: "address",
-            name: "paymentToken",
-            type: "address",
-          },
-          {
-            internalType: "uint256",
-            name: "price",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "paymentTokenPrice",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "wethAccumulated",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "wethBalance",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "paymentTokenBalance",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct Multicall.AuctionState",
-        name: "state",
-        type: "tuple",
-      },
-    ],
-    stateMutability: "view",
+    inputs: [{ internalType: "bool", name: "support", type: "bool" }],
+    name: "vote",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "resolveVote",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "cancel",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "withdraw",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "claimId", type: "uint256" }],
+    name: "acceptClaim",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
 ] as const;

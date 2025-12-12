@@ -11,35 +11,7 @@ body {
   font-family: system-ui, sans-serif;
   background-color: #000;
   color: #fff;
-  overflow: hidden;
-}
-
-@keyframes glow-pulse {
-  0%,
-  100% {
-    box-shadow: inset 0 0 18px rgba(236, 72, 153, 0.35);
-  }
-  50% {
-    box-shadow: inset 0 0 28px rgba(236, 72, 153, 0.7);
-  }
-}
-
-.animate-glow {
-  animation: glow-pulse 1.8s ease-in-out infinite;
-}
-
-@keyframes scroll-text {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-4000px);
-  }
-}
-
-.animate-scroll {
-  animation: scroll-text 60s linear infinite;
-  will-change: transform;
+  overflow-x: hidden;
 }
 
 .scrollbar-hide {
@@ -49,4 +21,40 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Input styles */
+.input-base {
+  @apply w-full rounded-xl border border-zinc-800 bg-zinc-900 pr-4 py-3 text-sm text-white placeholder-zinc-500 transition-colors focus:border-zinc-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50;
+  padding-left: 1rem;
+}
+
+/* Activity feed animation */
+@keyframes slide-in-from-top {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+  }
+  50% {
+    box-shadow: 0 0 20px 4px rgba(244, 63, 94, 0.3);
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in-from-top 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-new-item {
+  animation: slide-in-from-top 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+             pulse-glow 2s ease-in-out;
 }
