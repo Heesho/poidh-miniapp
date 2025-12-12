@@ -33,6 +33,7 @@ export function useClaims(bountyAddress: Address | undefined) {
         proof: {
           description: `Proof for ${c.name}`,
           imageUrl: `https://picsum.photos/seed/${c.id}/400/300`,
+          externalUrl: undefined,
         },
       })),
       isLoading: false,
