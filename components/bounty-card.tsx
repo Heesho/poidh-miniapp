@@ -61,23 +61,23 @@ export function BountyCard({ bounty, className, userAddress, userJoinedBounties,
     const tags: { label: string; color: string }[] = [];
 
     if (bounty.state === BountyState.VOTING && hasStake) {
-      tags.push({ label: "Vote", color: "bg-amber-500/20 text-amber-300" });
+      tags.push({ label: "Vote", color: "border-amber-500/50 text-amber-400" });
       return tags;
     }
     if (bounty.state === BountyState.CANCELLED && hasStake) {
-      tags.push({ label: "Withdraw", color: "bg-zinc-500/20 text-zinc-300" });
+      tags.push({ label: "Withdraw", color: "border-zinc-500/50 text-zinc-400" });
       return tags;
     }
     if (bounty.state === BountyState.OPEN && isIssuer && Number(bounty.claimsCount) > 0) {
-      tags.push({ label: "Select", color: "bg-green-500/20 text-green-300" });
+      tags.push({ label: "Select", color: "border-amber-500/50 text-amber-400" });
       return tags;
     }
     // Join and Claim can both show
     if (bounty.state === BountyState.OPEN && bounty.joinable && userAddress && !isIssuer && !hasJoined) {
-      tags.push({ label: "Join", color: "bg-blue-500/20 text-blue-300" });
+      tags.push({ label: "Join", color: "border-blue-500/50 text-blue-400" });
     }
     if (bounty.state === BountyState.OPEN && userAddress && !isIssuer && !hasClaimed) {
-      tags.push({ label: "Claim", color: "bg-rose-500/20 text-rose-300" });
+      tags.push({ label: "Claim", color: "border-rose-500/50 text-rose-400" });
     }
     return tags;
   };
@@ -211,7 +211,7 @@ export function BountyCard({ bounty, className, userAddress, userJoinedBounties,
                     <span
                       key={tag.label}
                       className={cn(
-                        "inline-flex items-center rounded-full font-semibold uppercase tracking-wider px-2 py-0.5 text-[9px] animate-pulse",
+                        "inline-flex items-center rounded-full font-semibold uppercase tracking-wider px-2 py-0.5 text-[9px] border bg-transparent",
                         tag.color
                       )}
                     >

@@ -19,9 +19,9 @@ const stateConfig: Record<
 > = {
   [BountyState.OPEN]: {
     label: "Open",
-    bgColor: "bg-green-500/10",
-    textColor: "text-green-400",
-    dotColor: "bg-green-500",
+    bgColor: "bg-blue-500/10",
+    textColor: "text-blue-400",
+    dotColor: "bg-blue-500",
   },
   [BountyState.VOTING]: {
     label: "Voting",
@@ -31,15 +31,15 @@ const stateConfig: Record<
   },
   [BountyState.CLOSED]: {
     label: "Closed",
-    bgColor: "bg-zinc-500/10",
-    textColor: "text-zinc-400",
-    dotColor: "bg-zinc-500",
-  },
-  [BountyState.CANCELLED]: {
-    label: "Cancelled",
     bgColor: "bg-red-500/10",
     textColor: "text-red-400",
     dotColor: "bg-red-500",
+  },
+  [BountyState.CANCELLED]: {
+    label: "Cancelled",
+    bgColor: "bg-zinc-500/10",
+    textColor: "text-zinc-400",
+    dotColor: "bg-zinc-500",
   },
 };
 

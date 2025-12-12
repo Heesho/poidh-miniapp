@@ -526,15 +526,15 @@ export default function BountyDetailPage({
             <StateBadge state={bounty.state} size="sm" />
             {/* User relationship tag */}
             {isIssuer ? (
-              <span className="inline-flex items-center rounded-full font-semibold uppercase tracking-wider px-2 py-0.5 text-[9px] bg-rose-500/10 text-rose-400">
+              <span className="inline-flex items-center rounded-full font-semibold uppercase tracking-wider px-2 py-0.5 text-[9px] border border-amber-500/50 text-amber-400">
                 Issued
               </span>
             ) : hasStake ? (
-              <span className="inline-flex items-center rounded-full font-semibold uppercase tracking-wider px-2 py-0.5 text-[9px] bg-blue-500/10 text-blue-400">
+              <span className="inline-flex items-center rounded-full font-semibold uppercase tracking-wider px-2 py-0.5 text-[9px] border border-blue-500/50 text-blue-400">
                 Joined
               </span>
             ) : hasClaimed ? (
-              <span className="inline-flex items-center rounded-full font-semibold uppercase tracking-wider px-2 py-0.5 text-[9px] bg-purple-500/10 text-purple-400">
+              <span className="inline-flex items-center rounded-full font-semibold uppercase tracking-wider px-2 py-0.5 text-[9px] border border-rose-500/50 text-rose-400">
                 Claimed
               </span>
             ) : null}
@@ -611,9 +611,9 @@ export default function BountyDetailPage({
               <Card>
                 <CardContent className="p-3 text-center">
                   <div className="flex items-center justify-center gap-1.5 mb-1">
-                    <Coins className="h-4 w-4 text-rose-400" />
+                    <Coins className="h-4 w-4 text-amber-400" />
                   </div>
-                  <div className="text-lg font-bold text-rose-400">
+                  <div className="text-lg font-bold text-amber-400">
                     Ξ{Number(formatEther(bounty.totalStaked)).toLocaleString(undefined, { maximumFractionDigits: 3 })}
                   </div>
                   <div className="text-[10px] text-zinc-500 uppercase tracking-wide">Reward</div>
@@ -622,7 +622,7 @@ export default function BountyDetailPage({
               <Card>
                 <CardContent className="p-3 text-center">
                   <div className="flex items-center justify-center gap-1.5 mb-1">
-                    <MessageSquare className="h-4 w-4 text-blue-400" />
+                    <MessageSquare className="h-4 w-4 text-red-400" />
                   </div>
                   <div className="text-lg font-bold text-white">
                     {claims.length}
@@ -736,14 +736,14 @@ export default function BountyDetailPage({
               const description = winningClaim.name.length > 40 ? winningClaim.name.slice(0, 40) + "..." : winningClaim.name;
 
               return (
-                <div className="rounded-xl border border-green-500/50 bg-green-500/5 overflow-hidden">
+                <div className="rounded-xl border border-rose-500/50 bg-rose-500/5 overflow-hidden">
                   <div className="px-3 pt-3 pb-2 flex items-center gap-1.5">
-                    <Trophy className="h-4 w-4 text-green-400" />
-                    <span className="text-sm font-bold text-green-400 uppercase tracking-wide">Winner</span>
+                    <Trophy className="h-4 w-4 text-rose-400" />
+                    <span className="text-sm font-bold text-rose-400 uppercase tracking-wide">Winner</span>
                   </div>
                   <Link
                     href={`/claim/${bountyAddress}/${winningClaim.id}`}
-                    className="flex items-center gap-3 px-3 pb-3 hover:bg-green-500/10 transition-colors"
+                    className="flex items-center gap-3 px-3 pb-3 hover:bg-rose-500/10 transition-colors"
                   >
                     {proofImageUrl ? (
                       <img
