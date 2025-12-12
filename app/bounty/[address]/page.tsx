@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import {
   useAccount,
+  useBalance,
   useConnect,
   useWriteContract,
   useWaitForTransactionReceipt,
@@ -113,6 +114,13 @@ export default function BountyDetailPage({
 
   // Use demo user address in demo mode
   const address = DEMO_MODE ? DEMO_USER_ADDRESS : walletAddress;
+
+  // Get user's ETH balance
+  const { data: balanceData } = useBalance({
+    address: walletAddress,
+    chainId: base.id,
+  });
+  const userBalance = DEMO_MODE ? 2.5 : balanceData ? Number(formatEther(balanceData.value)) : 0;
 
   useEffect(() => {
     if (
@@ -704,8 +712,8 @@ export default function BountyDetailPage({
                   <div className="grid grid-cols-2 gap-px bg-amber-500/30">
                     <div className="bg-black p-3 text-center">
                       <div className="flex items-center justify-center gap-1.5">
-                        <CheckCircle2 className="h-4 w-4 text-green-400" />
-                        <span className="text-lg font-bold text-green-400">
+                        <CheckCircle2 className="h-4 w-4 text-blue-400" />
+                        <span className="text-lg font-bold text-blue-400">
                           Ξ{Number(formatEther(voteState.yes)).toLocaleString(undefined, { maximumFractionDigits: 2 })}
                         </span>
                       </div>
@@ -863,19 +871,26 @@ export default function BountyDetailPage({
           <div className="shrink-0 px-4 pt-3 bg-black flex flex-col gap-3">
             {/* Join Form */}
             {showJoinForm && (
-              <div className="relative">
-                <input
-                  type="number"
-                  value={joinAmount}
-                  onChange={(e) => setJoinAmount(e.target.value)}
-                  placeholder="0.00"
-                  step="0.001"
-                  min="0"
-                  className="w-full rounded-xl border-0 bg-zinc-900 py-3 pl-10 pr-4 text-base text-white placeholder-zinc-500 focus:outline-none"
-                  disabled={isSubmitting}
-                />
-                <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                  <span className="text-lg font-semibold text-zinc-300">Ξ</span>
+              <div className="flex flex-col gap-1.5">
+                <div className="relative">
+                  <input
+                    type="number"
+                    value={joinAmount}
+                    onChange={(e) => setJoinAmount(e.target.value)}
+                    placeholder="0.00"
+                    step="0.001"
+                    min="0"
+                    className="w-full rounded-xl border-0 bg-zinc-900 py-3 pl-10 pr-4 text-base text-white placeholder-zinc-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    disabled={isSubmitting}
+                  />
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                    <span className="text-lg font-semibold text-zinc-300">Ξ</span>
+                  </div>
+                </div>
+                <div className="px-1">
+                  <span className="text-[11px] text-zinc-500">
+                    Balance: <span className="text-zinc-400">Ξ{userBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
+                  </span>
                 </div>
               </div>
             )}
@@ -1035,7 +1050,7 @@ export default function BountyDetailPage({
                 className={cn(
                   "w-full h-11 cursor-not-allowed",
                   userVoteChoice === true
-                    ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                    ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
                     : "bg-red-500/20 text-red-400 border border-red-500/30"
                 )}
                 disabled
@@ -1056,7 +1071,7 @@ export default function BountyDetailPage({
               // User has staked and hasn't voted yet
               <div className="flex gap-3">
                 <Button
-                  className="flex-1 h-11 bg-green-500 hover:bg-green-600 text-white"
+                  className="flex-1 h-11 bg-blue-500 hover:bg-blue-600 text-white"
                   onClick={() => handleVote(true)}
                   disabled={isSubmitting}
                 >

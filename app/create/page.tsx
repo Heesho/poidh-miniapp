@@ -6,12 +6,13 @@ import { sdk } from "@farcaster/miniapp-sdk";
 import { PlusCircle, Coins, Users, AlertCircle } from "lucide-react";
 import {
   useAccount,
+  useBalance,
   useConnect,
   useWriteContract,
   useWaitForTransactionReceipt,
 } from "wagmi";
 import { base } from "wagmi/chains";
-import { parseEther, type Address } from "viem";
+import { parseEther, formatEther, type Address } from "viem";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -82,6 +83,13 @@ export default function CreateBountyPage() {
   const { address, isConnected } = useAccount();
   const { connectors, connectAsync, isPending: isConnecting } = useConnect();
   const primaryConnector = connectors[0];
+
+  // Get user's ETH balance
+  const { data: balanceData } = useBalance({
+    address,
+    chainId: base.id,
+  });
+  const userBalance = balanceData ? Number(formatEther(balanceData.value)) : 0;
 
   useEffect(() => {
     if (
@@ -273,20 +281,27 @@ export default function CreateBountyPage() {
                 <Coins className="h-3.5 w-3.5 text-rose-400" />
                 Amount <span className="text-rose-400">*</span>
               </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0.00"
-                  step="0.001"
-                  min="0"
-                  className="input-base"
-                  style={{ paddingLeft: '3rem' }}
-                  disabled={isSubmitting}
-                />
-                <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                  <span className="text-base font-medium text-zinc-400">Ξ</span>
+              <div className="flex flex-col gap-1.5">
+                <div className="relative">
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="0.00"
+                    step="0.001"
+                    min="0"
+                    className="input-base [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    style={{ paddingLeft: '3rem' }}
+                    disabled={isSubmitting}
+                  />
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                    <span className="text-base font-medium text-zinc-400">Ξ</span>
+                  </div>
+                </div>
+                <div className="px-1">
+                  <span className="text-[11px] text-zinc-500">
+                    Balance: <span className="text-zinc-400">Ξ{userBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
+                  </span>
                 </div>
               </div>
             </div>

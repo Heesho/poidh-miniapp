@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { sdk } from "@farcaster/miniapp-sdk";
 import Link from "next/link";
-import { Trophy, Coins, Gift, Target, Users, Vote, Send } from "lucide-react";
+import { Trophy, Coins, Gift, Target, Users, Vote, Send, Camera, XCircle, ThumbsUp, ThumbsDown } from "lucide-react";
 import { useAccount, useConnect } from "wagmi";
 import { base } from "wagmi/chains";
 import { formatEther } from "viem";
@@ -56,13 +56,13 @@ const timeAgo = (timestamp: number) => {
 };
 
 const activityConfig: Record<ActivityType, { icon: typeof Trophy; color: string; bgColor: string; label: string }> = {
-  bounty_created: { icon: Target, color: "text-rose-400", bgColor: "bg-rose-500/10", label: "New bounty created" },
-  bounty_joined: { icon: Users, color: "text-blue-400", bgColor: "bg-blue-500/10", label: "Joined bounty" },
-  claim_submitted: { icon: Send, color: "text-sky-400", bgColor: "bg-sky-500/10", label: "Claim submitted" },
+  bounty_created: { icon: Target, color: "text-blue-400", bgColor: "bg-blue-500/10", label: "Created a bounty" },
+  bounty_joined: { icon: Coins, color: "text-blue-400", bgColor: "bg-blue-500/10", label: "Joined bounty" },
+  claim_submitted: { icon: Camera, color: "text-rose-400", bgColor: "bg-rose-500/10", label: "Submitted proof" },
   vote_started: { icon: Vote, color: "text-amber-400", bgColor: "bg-amber-500/10", label: "Voting started" },
-  vote_cast: { icon: Vote, color: "text-blue-400", bgColor: "bg-blue-500/10", label: "Vote cast" },
-  bounty_paid: { icon: Gift, color: "text-emerald-400", bgColor: "bg-emerald-500/10", label: "Bounty paid" },
-  bounty_cancelled: { icon: Target, color: "text-red-400", bgColor: "bg-red-500/10", label: "Bounty cancelled" },
+  vote_cast: { icon: Vote, color: "text-amber-400", bgColor: "bg-amber-500/10", label: "Voted" },
+  bounty_paid: { icon: Trophy, color: "text-amber-400", bgColor: "bg-amber-500/10", label: "Won bounty" },
+  bounty_cancelled: { icon: XCircle, color: "text-zinc-400", bgColor: "bg-zinc-500/10", label: "Cancelled" },
 };
 
 const getUserDisplay = (addr: string | undefined): { name: string; avatar: string | null } => {
@@ -78,27 +78,24 @@ const getUserDisplay = (addr: string | undefined): { name: string; avatar: strin
   return { name: formatAddress(addr), avatar: null };
 };
 
-const getActivityMessage = (activity: ActivityItem): string => {
-  const addr = activity.data.user || activity.data.claimant || activity.data.winner;
-  const { name } = getUserDisplay(addr);
-
+const getActivityAction = (activity: ActivityItem): string => {
   switch (activity.type) {
     case "bounty_created":
-      return `${name} created a new bounty`;
+      return "Created a bounty";
     case "bounty_joined":
-      return `${name} joined with Ξ${activity.data.amount}`;
+      return `Joined with Ξ${activity.data.amount}`;
     case "claim_submitted":
-      return `${name} submitted "${activity.data.claimName || "a claim"}"`;
+      return activity.data.claimName ? `"${activity.data.claimName.slice(0, 30)}${activity.data.claimName.length > 30 ? '...' : ''}"` : "Submitted proof";
     case "vote_started":
-      return `Voting started on claim #${activity.data.claimId}`;
+      return "Voting started";
     case "vote_cast":
-      return `${name} voted ${activity.data.support ? "yes" : "no"}`;
+      return activity.data.support ? "Voted yes" : "Voted no";
     case "bounty_paid":
-      return `${name} won Ξ${activity.data.reward}`;
+      return `Won Ξ${activity.data.reward}`;
     case "bounty_cancelled":
-      return `Bounty was cancelled`;
+      return "Bounty cancelled";
     default:
-      return "Activity occurred";
+      return "Activity";
   }
 };
 
@@ -169,6 +166,15 @@ export default function Home() {
 
   // Fetch bounties for stats
   const { bounties, totalCount } = useBounties(100, 0);
+
+  // Create a map of bounty address to title
+  const bountyTitleMap = useMemo(() => {
+    const map = new Map<string, string>();
+    bounties.forEach(b => {
+      map.set(b.address.toLowerCase(), b.metadata?.title || "Untitled");
+    });
+    return map;
+  }, [bounties]);
 
   // Fetch activity feed
   const { activities, isLoading: isLoadingActivity } = useActivityFeed(30);
@@ -261,12 +267,12 @@ export default function Home() {
             <Card>
               <CardContent className="p-3">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
-                    <Gift className="h-4 w-4 text-emerald-400" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10">
+                    <Gift className="h-4 w-4 text-amber-400" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Rewards Paid</p>
-                    <p className="text-sm font-bold text-emerald-400">{formatEth(rewardsPaid)}</p>
+                    <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Paid</p>
+                    <p className="text-sm font-bold text-white">{formatEth(rewardsPaid)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -274,12 +280,12 @@ export default function Home() {
             <Card>
               <CardContent className="p-3">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-500/10">
-                    <Coins className="h-4 w-4 text-rose-400" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10">
+                    <Coins className="h-4 w-4 text-amber-400" />
                   </div>
                   <div>
                     <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Available</p>
-                    <p className="text-sm font-bold text-rose-400">{formatEth(totalStaked)}</p>
+                    <p className="text-sm font-bold text-white">{formatEth(totalStaked)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -300,11 +306,11 @@ export default function Home() {
             <Card>
               <CardContent className="p-3">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10">
-                    <Trophy className="h-4 w-4 text-blue-400" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10">
+                    <Trophy className="h-4 w-4 text-red-400" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Open Now</p>
+                    <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Open Bounties</p>
                     <p className="text-sm font-bold text-white">{openBounties}</p>
                   </div>
                 </div>
@@ -341,36 +347,48 @@ export default function Home() {
                 const config = activityConfig[activity.type];
                 const Icon = config.icon;
                 const user = getActivityUser(activity);
+                const bountyTitle = bountyTitleMap.get(activity.bountyAddress.toLowerCase()) || "Bounty";
+                const truncatedTitle = bountyTitle.length > 25 ? bountyTitle.slice(0, 25) + "..." : bountyTitle;
 
                 return (
                   <Link
                     key={activity.id}
                     href={`/bounty/${activity.bountyAddress}`}
                     className={cn(
-                      "flex items-start gap-3 rounded-xl bg-zinc-900/50 border border-zinc-800/50 p-3 transition-colors hover:bg-zinc-900 hover:border-zinc-700",
+                      "flex items-center gap-3 rounded-xl bg-zinc-900/50 border border-zinc-800/50 p-3 transition-colors hover:bg-zinc-900 hover:border-zinc-700",
                       newIds.has(activity.id) && "animate-new-item"
                     )}
                   >
-                    {user.avatar ? (
-                      <Avatar className="h-8 w-8 shrink-0">
-                        <AvatarImage src={user.avatar} alt={user.name} />
-                        <AvatarFallback className={cn("text-xs", config.bgColor, config.color)}>
-                          {initialsFrom(user.name)}
-                        </AvatarFallback>
-                      </Avatar>
-                    ) : (
-                      <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg", config.bgColor)}>
-                        <Icon className={cn("h-4 w-4", config.color)} />
-                      </div>
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs text-zinc-300 leading-relaxed">
-                        {getActivityMessage(activity)}
-                      </p>
-                      <p className="mt-1 text-[10px] text-zinc-500">
-                        {timeAgo(activity.timestamp)}
-                      </p>
+                    {/* Activity Icon */}
+                    <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-lg", config.bgColor)}>
+                      <Icon className={cn("h-5 w-5", config.color)} />
                     </div>
+
+                    {/* Content */}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[11px] text-zinc-500 truncate">{truncatedTitle}</p>
+                      <p className="text-xs font-medium text-white leading-relaxed mt-0.5">
+                        {getActivityAction(activity)}
+                      </p>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        {user.avatar ? (
+                          <Avatar className="h-4 w-4">
+                            <AvatarImage src={user.avatar} alt={user.name} />
+                            <AvatarFallback className="text-[6px] bg-zinc-800 text-zinc-400">
+                              {initialsFrom(user.name)}
+                            </AvatarFallback>
+                          </Avatar>
+                        ) : (
+                          <div className="h-4 w-4 rounded-full bg-zinc-800" />
+                        )}
+                        <span className="text-[11px] text-zinc-500">{user.name}</span>
+                      </div>
+                    </div>
+
+                    {/* Time */}
+                    <span className="text-[10px] text-zinc-500 shrink-0">
+                      {timeAgo(activity.timestamp)}
+                    </span>
                   </Link>
                 );
               })}
